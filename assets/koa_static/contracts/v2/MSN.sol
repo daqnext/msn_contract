@@ -7,13 +7,12 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MSN is ERC20 {
     uint256 payable_amount;
-
     address contract_owner;
     bool exchange_open;
     mapping(address => uint16) special_list;
 
     modifier onlyContractOwner() {
-        require(msg.sender == contract_owner, "only contractOwner");
+        require(msg.sender == contract_owner, "Only contractOwner");
         _;
     }
 
@@ -34,7 +33,7 @@ contract MSN is ERC20 {
         external
         onlyContractOwner
     {
-        require(_id > 0, "starting from 1");
+        require(_id > 0, "Special ID should start from 1");
         special_list[special_addr] = _id;
         emit add_special_EVENT(special_addr, _id);
     }
@@ -45,7 +44,7 @@ contract MSN is ERC20 {
         require(special_list[special_addr] > 0, "No such special");
         require(
             special_addr != contract_owner,
-            "Can not delete contract Owner"
+            "Can not delete contract owner"
         );
         uint16 special_id = special_list[special_addr];
         delete special_list[special_addr];
@@ -57,7 +56,7 @@ contract MSN is ERC20 {
         return special_list[special_addr];
     }
 
-    //mint is open for mining Inflation increment
+    // mint is open for mining inflation increment
     event mint_EVENT(address _from, uint256 amount);
 
     function mint(uint256 amount) public onlyContractOwner {
@@ -65,7 +64,7 @@ contract MSN is ERC20 {
         emit mint_EVENT(msg.sender, amount);
     }
 
-    //anyone can burn hisown token
+    // anyone can burn his own token
     event burn_EVENT(address _from, uint256 amount);
 
     function burn(uint256 amount) external {
@@ -81,7 +80,7 @@ contract MSN is ERC20 {
         return exchange_open;
     }
 
-    /////overwrite to inject the modifer
+    //overwrite to inject the modifier
     function _approve(
         address owner,
         address spender,
@@ -91,7 +90,7 @@ contract MSN is ERC20 {
             exchange_open == true ||
                 (special_list[owner] > 0) ||
                 (special_list[spender] > 0),
-            "exchange closed && not special"
+            "Exchange closed && not special"
         );
 
         super._approve(owner, spender, amount);
@@ -113,7 +112,7 @@ contract MSN is ERC20 {
             exchange_open == true ||
                 (special_list[sender] > 0) ||
                 (special_list[recipient] > 0),
-            "exchange closed && not special"
+            "Exchange closed && not special"
         );
 
         super._transfer(sender, recipient, amount);

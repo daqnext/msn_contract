@@ -9,25 +9,24 @@ contract DAO {
     uint256 payable_amount;
 
     struct Proposal {
-        uint16 pid; //proposal identifier
-        address creator; // Address of the shareholder who created the proposal
-        uint256 startTime; // A unix timestamp, denoting the start of the voting period
-        uint256 endTime; // A unix timestamp, denoting the end of the voting period
+        uint16 pid;         // proposal identifier
+        address creator;    // address of the shareholder who created the proposal
+        uint256 startTime;  // a unix timestamp, denoting the start of the voting period
+        uint256 endTime;    // a unix timestamp, denoting the end of the voting period
     }
 
-    mapping(uint16 => mapping(uint8 => uint256)) proposal_votes; // pid => (option=>total_votes)
+    mapping(uint16 => Proposal) private proposals; // pid => proposal
+    mapping(uint16 => mapping(uint8 => uint256)) proposal_votes; // pid => (option => total_votes)
+    mapping(address => mapping(uint16 => uint8)) private votes; // voter => (pid => selected option), selected option should start from 1
 
     string private ProposalFolderUrl; // the detailed proposal description is inside this folder
     address private DAOOwner;
     address private MSNAddr;
 
-    mapping(address => string) private keepers; // how can create and manage proposals
-
-    mapping(uint16 => Proposal) private proposals; // pid => proposal
-    mapping(address => mapping(uint16 => uint8)) private votes; // voter => ( pid=> selected option) ,selected option start from 1
-    mapping(address => uint256) private deposit; // from => amount
-    mapping(address => uint256) private deposit_lasttime; //from =>last vote time
-    uint256 voter_hold_secs; // how much time in seconds to keep before voter withdraw
+    mapping(address => string) private keepers; // who can create and manage proposals
+    mapping(address => uint256) private deposit; // depositor => amount
+    mapping(address => uint256) private deposit_lasttime; // depositor => last vote time
+    uint256 voter_hold_secs; // how long in seconds to keep before voters withdraw
 
     constructor(address _MSNcontractAddr, uint256 _voter_hold_secs) {
         DAOOwner = msg.sender;
@@ -37,19 +36,19 @@ contract DAO {
     }
 
     modifier onlyDAOOwner() {
-        require(msg.sender == DAOOwner, "only DAOOwner");
+        require(msg.sender == DAOOwner, "Only DAOOwner");
         _;
     }
 
-    event set_DAOOwner_EVENT(address oldOwner, address newOwner);
+    event change_DAOOwner_EVENT(address oldOwner, address newOwner);
 
-    function set_DAOOwner(address _newOwner) external onlyDAOOwner {
-        require(_newOwner != DAOOwner, "newOwner must not be old");
+    function change_DAOOwner(address _newOwner) external onlyDAOOwner {
+        require(_newOwner != DAOOwner, "The new owner must be different from the old");
         address oldDAOOwner = DAOOwner;
         delete keepers[oldDAOOwner];
         DAOOwner = _newOwner;
         keepers[_newOwner] = "DAOOwner";
-        emit set_DAOOwner_EVENT(oldDAOOwner, _newOwner);
+        emit change_DAOOwner_EVENT(oldDAOOwner, _newOwner);
     }
 
     function get_DAOOwner() external view returns (address) {
@@ -83,13 +82,18 @@ contract DAO {
         );
     }
 
+    modifier onlyKeeper() {
+        require(bytes(keepers[msg.sender]).length != 0, "No such a Keeper");
+        _;
+    }
+
     event add_keeper_EVENT(address keeper_addr, string keeper_name);
 
     function add_keeper(address keeper_addr, string calldata keeper_name)
         external
         onlyDAOOwner
     {
-        require(bytes(keeper_name).length != 0, "No Name");
+        require(bytes(keeper_name).length != 0, "No name");
         keepers[keeper_addr] = keeper_name;
         emit add_keeper_EVENT(keeper_addr, keeper_name);
     }
@@ -97,16 +101,11 @@ contract DAO {
     event remove_keeper_EVENT(address keeper_addr, string keeper_name);
 
     function remove_keeper(address keeper_addr) external onlyDAOOwner {
-        require(bytes(keepers[keeper_addr]).length != 0, "NO SUCH Keeper");
-        require(keeper_addr != DAOOwner, "CAN NOT DELETE DAOOwner");
+        require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
+        require(keeper_addr != DAOOwner, "Can not delete DAOOwner");
         string memory keeper_name = keepers[keeper_addr];
         delete keepers[keeper_addr];
         emit remove_keeper_EVENT(keeper_addr, keeper_name);
-    }
-
-    modifier onlyKeeper() {
-        require(bytes(keepers[msg.sender]).length != 0, "NO SUCH Keeper");
-        _;
     }
 
     function set_voter_hold_secs(uint256 secs) public onlyDAOOwner {
@@ -129,14 +128,14 @@ contract DAO {
         uint256 _startTime,
         uint256 _endTime
     ) external onlyKeeper {
-        require(proposals[_pid].pid == 0, "Proposal already exist");
+        require(proposals[_pid].pid == 0, "The proposal already exists");
         require(
             _endTime > block.timestamp,
-            "_endTime must bigger then blocktime"
+            "EndTime must be bigger than blocktime"
         );
         require(
             _startTime < _endTime,
-            "startTime must be smaller then _endTime"
+            "StartTime must be smaller than endTime"
         );
         proposals[_pid] = Proposal(_pid, msg.sender, _startTime, _endTime);
         emit add_proposal_EVENT(_pid, msg.sender, _startTime, _endTime);
@@ -145,10 +144,10 @@ contract DAO {
     event remove_proposal_EVENT(address _from, uint16 _pid);
 
     function remove_proposal(uint16 _pid) external onlyKeeper {
-        require(proposals[_pid].pid != 0, "Proposal not exist");
+        require(proposals[_pid].pid != 0, "The proposal doesn't exist");
         require(
             (proposals[_pid].creator == msg.sender) || (msg.sender == DAOOwner),
-            "Not Allowed"
+            "No permission to remove the proposal"
         );
         delete proposals[_pid];
         emit remove_proposal_EVENT(msg.sender, _pid);
@@ -164,7 +163,7 @@ contract DAO {
             uint256
         )
     {
-        require(proposals[_pid].pid != 0, "Proposal not exist");
+        require(proposals[_pid].pid != 0, "The proposal doesn't exist");
         return (
             _pid,
             proposals[_pid].creator,
@@ -180,7 +179,7 @@ contract DAO {
             msg.sender,
             address(this)
         );
-        require(allowance > 0, "nothing deposit");
+        require(allowance > 0, "No deposit");
         bool result = IERC20(MSNAddr).transferFrom(
             msg.sender,
             address(this),
@@ -198,10 +197,10 @@ contract DAO {
     function voter_withdraw_all() external {
         require(
             deposit_lasttime[msg.sender] + voter_hold_secs < block.timestamp,
-            "Not Enough Time"
+            "Not enough time"
         );
         uint256 d_amount = deposit[msg.sender];
-        require(d_amount > 0, "no deposit");
+        require(d_amount > 0, " No deposit");
         deposit[msg.sender] = 0;
         IERC20(MSNAddr).transfer(msg.sender, d_amount);
         emit voter_withdraw_all_EVENT(msg.sender, d_amount);
@@ -216,18 +215,18 @@ contract DAO {
     );
 
     function vote(uint16 _pid, uint8 _option) external {
-        require(_pid > 0, "pid must be bigger then 0");
-        require(proposals[_pid].pid != 0, "Proposal not exist");
+        require(_pid > 0, "Pid should start from 1");
+        require(proposals[_pid].pid != 0, "The proposal doesn't exist");
         require(
             proposals[_pid].startTime < block.timestamp,
-            "Proposal not start yet"
+            "The proposal doesn't start yet"
         );
         require(
             proposals[_pid].endTime > block.timestamp,
-            "Proposal already end"
+            "The proposal already ends voting"
         );
-        require(deposit[msg.sender] > 0, "Can not vote without deposit");
-        require(votes[msg.sender][_pid] == 0, "Vote already");
+        require(deposit[msg.sender] > 0, "No deposit");
+        require(votes[msg.sender][_pid] == 0, "Voted already");
 
         votes[msg.sender][_pid] = _option;
         proposal_votes[_pid][_option] += deposit[msg.sender];
@@ -246,7 +245,7 @@ contract DAO {
         view
         returns (uint256)
     {
-        require(proposals[_pid].pid != 0, "Proposal not exist");
+        require(proposals[_pid].pid != 0, "The proposal doesn't exist");
         return proposal_votes[_pid][_option];
     }
 
