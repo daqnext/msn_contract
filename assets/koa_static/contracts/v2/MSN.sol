@@ -64,7 +64,7 @@ contract MSN is ERC20 {
         emit mint_EVENT(msg.sender, amount);
     }
 
-    // anyone can burn his own token
+    // anyone can burn their own token
     event burn_EVENT(address _from, uint256 amount);
 
     function burn(uint256 amount) external {

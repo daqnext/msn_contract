@@ -97,6 +97,11 @@ contract DAO {
         keepers[keeper_addr] = keeper_name;
         emit add_keeper_EVENT(keeper_addr, keeper_name);
     }
+    
+    function get_keeper_byte64(address keeper_addr) public view returns (string memory){
+        require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
+        return keepers[keeper_addr];
+    }
 
     event remove_keeper_EVENT(address keeper_addr, string keeper_name);
 
@@ -191,6 +196,15 @@ contract DAO {
             emit deposit_all_EVENT(msg.sender, allowance);
         }
     }
+    
+    function get_deposit() public view returns (uint256){
+        return deposit[msg.sender];
+    }
+
+    function get_deposit_lasttime() public view returns (uint256){
+        return deposit_lasttime[msg.sender];
+    }
+    
 
     event voter_withdraw_all_EVENT(address _from, uint256 amount);
 
