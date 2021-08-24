@@ -4,7 +4,7 @@ var common = {
   logfilename:'default.log',
   logtypes:['console','file'],
   /// server port 
-  port: 80,
+  port: 8080,
 
   //sqldb 
   db_host:'localhost',
