@@ -8,7 +8,7 @@ module.exports = {
     defaultNetwork: "ganache",
     networks: {
       ganache: {
-        url: `HTTP://172.31.14.210:8545`,
+        url: `HTTP://54.219.243.224:8545`,
         //chainId: 1337,
         //accounts: [`0x${DEPLOYER_PRIVATE_KEY}`],
         accounts: ['0x'+p_key], 
