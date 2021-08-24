@@ -24,6 +24,7 @@ contract MSN is ERC20 {
     ) ERC20(name, symbol) {
         contract_owner = msg.sender;
         special_list[msg.sender] = 1;
+        special_list_idmap[1]=msg.sender;
         exchange_open = false;
         _mint(msg.sender, inisupply * (10**uint256(decimals())));
     }
