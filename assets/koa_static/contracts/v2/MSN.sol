@@ -9,7 +9,8 @@ contract MSN is ERC20 {
     uint256 payable_amount;
     address contract_owner;
     bool exchange_open;
-    mapping(address => uint16) special_list;
+    mapping(address => uint16)  special_list;
+    mapping(uint16  => address) special_list_idmap;
 
     modifier onlyContractOwner() {
         require(msg.sender == contract_owner, "Only contractOwner");
@@ -34,7 +35,11 @@ contract MSN is ERC20 {
         onlyContractOwner
     {
         require(_id > 0, "Special ID should start from 1");
+        require(special_list_idmap[_id] == address(0x0), "Id already exist!");
+        require(special_list[special_addr] == 0, "address already exist!");
+         
         special_list[special_addr] = _id;
+        special_list_idmap[_id]=special_addr;
         emit add_special_EVENT(special_addr, _id);
     }
 
@@ -48,12 +53,18 @@ contract MSN is ERC20 {
         );
         uint16 special_id = special_list[special_addr];
         delete special_list[special_addr];
+        delete special_list_idmap[special_id];
         emit remove_special_EVENT(special_addr, special_id);
     }
 
     function get_special(address special_addr) external view returns (uint16) {
         require(special_list[special_addr] > 0, "No such special");
         return special_list[special_addr];
+    }
+
+    function get_special_by_id(uint16 _id) external view returns (address) {
+        require(special_list_idmap[_id] != address(0x0), "No such special");
+        return special_list_idmap[_id];
     }
 
     // mint is open for mining inflation increment
