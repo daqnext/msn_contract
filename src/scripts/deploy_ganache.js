@@ -12,7 +12,8 @@ async function main() {
 
 
     const DAO = await ethers.getContractFactory("DAO");
-    const dao = await DAO.deploy(msn.address,3600*24*3);    //3 days
+    //const dao = await DAO.deploy(msn.address,3600*24*3);    //3 days
+    const dao = await DAO.deploy(msn.address,300);//5mins for easy testing 
     console.log("DAO deployed to:", dao.address);
 
 
