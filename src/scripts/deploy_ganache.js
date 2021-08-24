@@ -22,7 +22,8 @@ async function main() {
     var key_used=account_pkeys[account_used];
 
     var info={};
-    info.endpoint='54.219.243.224:8545'
+    info.endpoint='54.219.243.224:8545';
+    info.chainid='8080';
     info.account_used=account_used;
     info.key_used=key_used;
 
