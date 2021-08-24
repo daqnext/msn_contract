@@ -7,7 +7,7 @@
     "build": "waffle",
     "test": "waffle & mocha  ./test/*.js --timeout 15000 --exit",
     "dev": "waffle & nodemon ./src/main.js",
-    "run_ganache":"ganache-cli --host 172.31.14.210 --account_keys_path ./assets/koa_static/keys.json",
+    "run_ganache": "ganache-cli --host 172.31.14.210 --account_keys_path ./assets/koa_static/keys.json",
     "deploy_ganache": "hardhat run ./src/scripts/deploy_ganache.js --network ganache ",
     "prod": "waffle & pm2 start pm2.json"
   },
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/daqnext/msn_contracts#readme",
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "axios": "^0.21.1",
     "ganache-cli": "^6.12.2",
