@@ -29,13 +29,21 @@ async function main() {
     var info={};
     info.endpoint='54.219.243.224:8545';
     info.chainid='8080';
-    info.msn_account_used=Object.keys(account_pkeys)[0];
-    info.msn_key_used=account_pkeys[msn_account_used];
 
     info.MSN=msn.address;
+    info.msn_deploy_account=Object.keys(account_pkeys)[0];
+    info.msn_deploy_key=account_pkeys[info.msn_deploy_account];
+
+     
     info.MINING=mining.address;
+    info.mining_deploy_account=Object.keys(account_pkeys)[1];
+    info.mining_deploy_key=account_pkeys[info.mining_deploy_account];
+
+
     info.DAO=dao.address;
-    
+    info.dao_deploy_account=Object.keys(account_pkeys)[2];
+    info.dao_deploy_key=account_pkeys[info.dao_deploy_account];
+
     info.accounts=account_pkeys;
 
     const fs = require('fs');
