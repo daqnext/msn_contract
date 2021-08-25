@@ -1,7 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 var keysjson= require("./assets/koa_static/keys.json")
 var account_pkeys=keysjson.private_keys;
-var p_key=account_pkeys[Object.keys(account_pkeys)[0]];
+//var p_key=account_pkeys[Object.keys(account_pkeys)[0]];
 //console.log("private key to use",p_key);
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
         url: `HTTP://54.219.243.224:8545`,
         //chainId: 1337,
         //accounts: [`0x${DEPLOYER_PRIVATE_KEY}`],
-        accounts: ['0x'+p_key], 
+        accounts: Object.values(account_pkeys),//['0x'+p_key], 
       },
     },
     solidity: {
