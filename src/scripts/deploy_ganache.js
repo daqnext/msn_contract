@@ -2,7 +2,7 @@
 async function main() {
 
     const accounts = await ethers.getSigners();
-    console.log(accounts);
+    console.log(accounts.length);
 
     // We get the contract to deploy
     const Msn = await ethers.getContractFactory("MSN");
