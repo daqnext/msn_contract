@@ -1,5 +1,9 @@
 
 async function main() {
+
+    const accounts = await ethers.getSigners();
+    console.log(accounts);
+
     // We get the contract to deploy
     const Msn = await ethers.getContractFactory("MSN");
     const msn = await Msn.deploy("Meson.network Testnet Token","MSNTT",100000000);
@@ -19,14 +23,14 @@ async function main() {
 
     var keysjson= require("../../assets/koa_static/keys.json")
     var account_pkeys=keysjson.private_keys;
-    var account_used=Object.keys(account_pkeys)[0];
-    var key_used=account_pkeys[account_used];
+    //var account_used=Object.keys(account_pkeys)[0];
+    //var key_used=account_pkeys[account_used];
 
     var info={};
     info.endpoint='54.219.243.224:8545';
     info.chainid='8080';
-    info.account_used=account_used;
-    info.key_used=key_used;
+    info.msn_account_used=Object.keys(account_pkeys)[0];
+    info.msn_key_used=account_pkeys[msn_account_used];
 
     info.MSN=msn.address;
     info.MINING=mining.address;
