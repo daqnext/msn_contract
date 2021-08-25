@@ -98,7 +98,7 @@ contract DAO {
         emit add_keeper_EVENT(keeper_addr, keeper_name);
     }
     
-    function get_keeper_byte64(address keeper_addr) public view returns (string memory){
+    function get_keeper(address keeper_addr) public view returns (string memory){
         require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
         return keepers[keeper_addr];
     }
