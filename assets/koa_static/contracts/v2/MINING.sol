@@ -29,7 +29,10 @@ contract MINING {
     event set_MiningOwner_EVENT(address oldOwner, address newOwner);
 
     function set_MiningOwner(address _newOwner) external onlyMiningOwner {
-        require(_newOwner != MiningOwner, "The new owner must be different from the old");
+        require(
+            _newOwner != MiningOwner,
+            "The new owner must be different from the old"
+        );
         address oldMiningOwner = MiningOwner;
         delete keepers[oldMiningOwner];
         MiningOwner = _newOwner;
@@ -146,16 +149,8 @@ contract MINING {
 
         claimed[merkleRoot][index] = true;
         bool result = IERC20(MSNAddr).transfer(msg.sender, amount);
-        if (result) {
-            emit claim_erc20_EVENT(
-                merkleRoot,
-                msg.sender,
-                amount,
-                block.timestamp
-            );
-        } else {
-            claimed[merkleRoot][index] = false;
-        }
+        require(result == true, "transfer error");
+        emit claim_erc20_EVENT(merkleRoot, msg.sender, amount, block.timestamp);
     }
 
     receive() external payable {

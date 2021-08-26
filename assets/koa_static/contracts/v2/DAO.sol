@@ -201,11 +201,13 @@ contract DAO {
             address(this),
             allowance
         );
-        if (result) {
-            deposit[msg.sender] += allowance;
-            deposit_lasttime[msg.sender] = block.timestamp;
-            emit deposit_all_EVENT(msg.sender, allowance);
-        }
+
+        require(result==true,"transfer error");
+
+        deposit[msg.sender] += allowance;
+        deposit_lasttime[msg.sender] = block.timestamp;
+        emit deposit_all_EVENT(msg.sender, allowance);
+        
     }
 
     function get_deposit() public view returns (uint256) {
