@@ -9,10 +9,10 @@ contract DAO {
     uint256 payable_amount;
 
     struct Proposal {
-        uint16 pid;         // proposal identifier
-        address creator;    // address of the shareholder who created the proposal
-        uint256 startTime;  // a unix timestamp, denoting the start of the voting period
-        uint256 endTime;    // a unix timestamp, denoting the end of the voting period
+        uint16 pid; // proposal identifier
+        address creator; // address of the shareholder who created the proposal
+        uint256 startTime; // a unix timestamp, denoting the start of the voting period
+        uint256 endTime; // a unix timestamp, denoting the end of the voting period
     }
 
     mapping(uint16 => Proposal) private proposals; // pid => proposal
@@ -43,7 +43,10 @@ contract DAO {
     event change_DAOOwner_EVENT(address oldOwner, address newOwner);
 
     function change_DAOOwner(address _newOwner) external onlyDAOOwner {
-        require(_newOwner != DAOOwner, "The new owner must be different from the old");
+        require(
+            _newOwner != DAOOwner,
+            "The new owner must be different from the old"
+        );
         address oldDAOOwner = DAOOwner;
         delete keepers[oldDAOOwner];
         DAOOwner = _newOwner;
@@ -97,8 +100,12 @@ contract DAO {
         keepers[keeper_addr] = keeper_name;
         emit add_keeper_EVENT(keeper_addr, keeper_name);
     }
-    
-    function get_keeper(address keeper_addr) public view returns (string memory){
+
+    function get_keeper(address keeper_addr)
+        public
+        view
+        returns (string memory)
+    {
         require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
         return keepers[keeper_addr];
     }
@@ -119,6 +126,10 @@ contract DAO {
 
     function get_voter_hold_secs() public view returns (uint256) {
         return voter_hold_secs;
+    }
+
+    function get_blocktime() public view returns (uint256) {
+        return block.timestamp;
     }
 
     event add_proposal_EVENT(
@@ -196,15 +207,14 @@ contract DAO {
             emit deposit_all_EVENT(msg.sender, allowance);
         }
     }
-    
-    function get_deposit() public view returns (uint256){
+
+    function get_deposit() public view returns (uint256) {
         return deposit[msg.sender];
     }
 
-    function get_deposit_lasttime() public view returns (uint256){
+    function get_deposit_lasttime() public view returns (uint256) {
         return deposit_lasttime[msg.sender];
     }
-    
 
     event voter_withdraw_all_EVENT(address _from, uint256 amount);
 
