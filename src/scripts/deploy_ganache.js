@@ -2,7 +2,7 @@ async function main() {
 
   const accounts = await ethers.getSigners();
   console.log('accounts number:',accounts.length);
-  const chainid=accounts[0].getChainId();
+  const chainid=await accounts[0].getChainId();
   console.log('chainid:',chainid);
 
   // We get the contract to deploy
