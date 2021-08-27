@@ -202,7 +202,7 @@ contract DAO {
             allowance
         );
 
-        require(result==true,"transfer error");
+        require(result==false,"transfer error");
 
         deposit[msg.sender] += allowance;
         deposit_lasttime[msg.sender] = block.timestamp;
