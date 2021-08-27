@@ -9,8 +9,6 @@ module.exports = {
     networks: {
       ganache: {
         url: `HTTP://54.219.243.224:8545`,
-        //chainId: 1337,
-        //accounts: [`0x${DEPLOYER_PRIVATE_KEY}`],
         accounts: Object.values(account_pkeys),//['0x'+p_key], 
       },
     },
