@@ -4,7 +4,7 @@
   "description": "meson network token contracts",
   "main": "index.js",
   "scripts": {
-    "build": "waffle",
+    "build": "waffle ",
     "test": "waffle & mocha  ./test/*.js --timeout 15000 --exit",
     "dev": "waffle & nodemon ./src/main.js",
     "run_ganache": "ganache-cli --host 172.31.0.107 --chainId 8080 --account_keys_path ./assets/koa_static/keys.json",
