@@ -2,10 +2,9 @@ require("@nomiclabs/hardhat-waffle");
 var account_key = require("./assets/koa_static/account_key.json");
 
 var privatekeys=[];
-account_key.forEach(ele=>function(){
-  privatekeys.push(ele.key);
+account_key.forEach(element => {
+  privatekeys.push(element.key);
 });
-
 
 console.log(privatekeys);
 
