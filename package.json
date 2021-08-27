@@ -7,8 +7,8 @@
     "build": "waffle ",
     "test": "waffle & mocha  ./test/*.js --timeout 15000 --exit",
     "dev": "waffle & nodemon ./src/main.js",
-    "run_devchain": "leo-dev-ethnode --allocate=0x97cc42197efbdb981166daee53dcbc928fbfa2ca,0x6223cd6336f86d239ba172231c26a2964a8d81bb,0x11862e02d4463999f1cdce098825c8e32e7f0c17 ",
-    "deploy_devchain": "hardhat run ./src/scripts/deploy_dev.js --network devchain ",
+    "run_ganache": "ganache-cli --host 172.31.0.107 --chainId 1337 --account_keys_path ./assets/koa_static/keys.json",
+    "deploy_ganache": "hardhat run ./src/scripts/deploy_ganache.js --network ganache ",
     "prod": "waffle & pm2 start pm2.json"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "axios": "^0.21.1",
+    "ganache-cli": "^6.12.2",
     "hardhat": "^2.6.1",
     "ioredis": "^4.27.6",
     "koa": "^2.13.1",
@@ -36,7 +37,6 @@
     "koa-json": "^2.0.2",
     "koa-router": "^10.0.0",
     "koa-static": "^5.0.0",
-    "leo-dev-ethnode": "^0.1.1",
     "log4js": "^6.3.0",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",

@@ -28,9 +28,6 @@ contract DAO {
     mapping(address => uint256) private deposit_lasttime; // depositor => last vote time
     uint256 voter_hold_secs; // how long in seconds to keep before voters withdraw
 
-
-    
-
     constructor(address _MSNcontractAddr, uint256 _voter_hold_secs) {
         DAOOwner = msg.sender;
         MSNAddr = _MSNcontractAddr;
@@ -191,11 +188,6 @@ contract DAO {
         );
     }
 
-
-    function set_deposit (uint256 value) external {
-        deposit[msg.sender]=value;
-    }
-
     event deposit_all_EVENT(address _from, uint256 amount);
 
     function deposit_all() external {
@@ -209,20 +201,19 @@ contract DAO {
             address(this),
             allowance
         );
-        require(t_result==true,"transfer error");
+        require(t_result == true, "transfer error");
 
         deposit[msg.sender] += allowance;
         deposit_lasttime[msg.sender] = block.timestamp;
         emit deposit_all_EVENT(msg.sender, allowance);
-        
     }
 
-    function get_deposit() public view returns (uint256) {
-        return deposit[msg.sender];
+    function get_deposit(address addr) public view returns (uint256) {
+        return deposit[addr];
     }
 
-    function get_deposit_lasttime() public view returns (uint256) {
-        return deposit_lasttime[msg.sender];
+    function get_deposit_lasttime(address addr) public view returns (uint256) {
+        return deposit_lasttime[addr];
     }
 
     event voter_withdraw_all_EVENT(address _from, uint256 amount);
@@ -235,8 +226,8 @@ contract DAO {
         uint256 d_amount = deposit[msg.sender];
         require(d_amount > 0, " No deposit");
         deposit[msg.sender] = 0;
-        bool t_result=IERC20(MSNAddr).transfer(msg.sender, d_amount);
-        require(t_result==true,'transfer error');
+        bool t_result = IERC20(MSNAddr).transfer(msg.sender, d_amount);
+        require(t_result == true, "transfer error");
         emit voter_withdraw_all_EVENT(msg.sender, d_amount);
     }
 
