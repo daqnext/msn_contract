@@ -6,6 +6,9 @@ account_key.forEach(ele=>function(){
   privatekeys.push(ele.key);
 });
 
+
+console.log(privatekeys);
+
 module.exports = {
     defaultNetwork: "devchain",
     networks: {
