@@ -196,13 +196,12 @@ contract DAO {
             address(this)
         );
         require(allowance > 0, "No deposit");
-        bool result = IERC20(MSNAddr).transferFrom(
+        bool t_result = IERC20(MSNAddr).transferFrom(
             msg.sender,
             address(this),
             allowance
         );
-
-        require(result==false,"transfer error");
+        require(t_result==true,"transfer error");
 
         deposit[msg.sender] += allowance;
         deposit_lasttime[msg.sender] = block.timestamp;
@@ -228,7 +227,8 @@ contract DAO {
         uint256 d_amount = deposit[msg.sender];
         require(d_amount > 0, " No deposit");
         deposit[msg.sender] = 0;
-        IERC20(MSNAddr).transfer(msg.sender, d_amount);
+        bool t_result=IERC20(MSNAddr).transfer(msg.sender, d_amount);
+        require(t_result==true,'transfer error');
         emit voter_withdraw_all_EVENT(msg.sender, d_amount);
     }
 
