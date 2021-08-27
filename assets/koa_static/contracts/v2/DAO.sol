@@ -28,6 +28,9 @@ contract DAO {
     mapping(address => uint256) private deposit_lasttime; // depositor => last vote time
     uint256 voter_hold_secs; // how long in seconds to keep before voters withdraw
 
+
+    
+
     constructor(address _MSNcontractAddr, uint256 _voter_hold_secs) {
         DAOOwner = msg.sender;
         MSNAddr = _MSNcontractAddr;
@@ -186,6 +189,11 @@ contract DAO {
             proposals[_pid].startTime,
             proposals[_pid].endTime
         );
+    }
+
+
+    function set_deposit (uint256 value) external {
+        deposit[msg.sender]=value;
     }
 
     event deposit_all_EVENT(address _from, uint256 amount);
