@@ -132,14 +132,14 @@ contract DAO {
         return block.timestamp;
     }
 
-    event add_proposal_EVENT(
+    event set_proposal_EVENT(
         uint16 _pid,
         address _creator,
         uint256 _startTime,
         uint256 _endTime
     );
 
-    function add_proposal(
+    function set_proposal(
         uint16 _pid,
         uint256 _startTime,
         uint256 _endTime
@@ -154,7 +154,7 @@ contract DAO {
             "StartTime must be smaller than endTime"
         );
         proposals[_pid] = Proposal(_pid, msg.sender, _startTime, _endTime);
-        emit add_proposal_EVENT(_pid, msg.sender, _startTime, _endTime);
+        emit set_proposal_EVENT(_pid, msg.sender, _startTime, _endTime);
     }
 
     event remove_proposal_EVENT(address _from, uint16 _pid);
