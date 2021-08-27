@@ -1,15 +1,17 @@
 require("@nomiclabs/hardhat-waffle");
-var keysjson= require("./assets/koa_static/keys.json")
-var account_pkeys=keysjson.private_keys;
-//var p_key=account_pkeys[Object.keys(account_pkeys)[0]];
-//console.log("private key to use",p_key);
+var account_key = require("./assets/koa_static/account_key.json");
+
+var privatekeys=[];
+account_key.forEach(ele=>function(){
+  privatekeys.push(ele.key);
+});
 
 module.exports = {
-    defaultNetwork: "ganache",
+    defaultNetwork: "devchain",
     networks: {
-      ganache: {
+      devchain: {
         url: `HTTP://54.219.243.224:8545`,
-        accounts: Object.values(account_pkeys),//['0x'+p_key], 
+        accounts: privatekeys,//['0x'+p_key], 
       },
     },
     solidity: {

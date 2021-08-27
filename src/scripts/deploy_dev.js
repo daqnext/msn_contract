@@ -1,11 +1,11 @@
 
 async function main() {
 
-    var address_key_array= require("../../assets/koa_static/keys.json");
+    var address_key_array= require("../../assets/koa_static/account_key.json");
     console.log(address_key_array);
 
     const accounts = await ethers.getSigners();
-    //console.log(accounts.length);
+    console.log(accounts.length);
 
     // We get the contract to deploy
     // const Msn = await ethers.getContractFactory("MSN",accounts[0]);
