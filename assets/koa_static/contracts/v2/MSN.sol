@@ -6,11 +6,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MSN is ERC20 {
-    uint256 payable_amount;
-    address contract_owner;
-    bool exchange_open;
-    mapping(address => uint16) special_list;
-    mapping(uint16 => address) special_list_idmap;
+    uint256 private payable_amount;
+    address private contract_owner;
+    bool private exchange_open;
+    mapping(address => uint16) private special_list;
+    mapping(uint16 => address) private special_list_idmap;
 
     modifier onlyContractOwner() {
         require(msg.sender == contract_owner, "Only contractOwner");

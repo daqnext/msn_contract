@@ -6,14 +6,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract MINING {
-    uint256 payable_amount;
+    uint256 private payable_amount;
 
     address private MSNAddr;
     address private MiningOwner;
 
     mapping(address => string) private keepers; //keeper account can add add_merkle_root
-    mapping(bytes32 => uint256) merkleRoots; // merkleRoot=>balance
-    mapping(bytes32 => mapping(uint256 => bool)) claimed; //bytes32 merkleRoot => (index => true|false)
+    mapping(bytes32 => uint256) private merkleRoots; // merkleRoot=>balance
+    mapping(bytes32 => mapping(uint256 => bool)) private claimed; //bytes32 merkleRoot => (index => true|false)
 
     constructor(address _MSNcontractAddr) {
         MiningOwner = msg.sender;
@@ -71,6 +71,15 @@ contract MINING {
         );
     }
 
+    function get_keeper(address keeper_addr)
+        public
+        view
+        returns (string memory)
+    {
+        require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
+        return keepers[keeper_addr];
+    }
+
     event add_keeper_EVENT(address keeper_addr, string keeper_name);
 
     function add_keeper(address keeper_addr, string calldata keeper_name)
@@ -118,7 +127,11 @@ contract MINING {
         emit remove_merkle_root_EVENT(msg.sender, merkleRoot, block.timestamp);
     }
 
-    function get_merkle_balance(bytes32 merkleRoot) public view returns (uint256) {
+    function get_merkle_balance(bytes32 merkleRoot)
+        public
+        view
+        returns (uint256)
+    {
         return merkleRoots[merkleRoot];
     }
 

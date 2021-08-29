@@ -16,17 +16,17 @@ contract DAO {
     }
 
     mapping(uint16 => Proposal) private proposals; // pid => proposal
-    mapping(uint16 => mapping(uint8 => uint256)) proposal_votes; // pid => (option => total_votes)
+    mapping(uint16 => mapping(uint8 => uint256)) private proposal_votes; // pid => (option => total_votes)
     mapping(address => mapping(uint16 => uint8)) private votes; // voter => (pid => selected option), selected option should start from 1
 
-    string private ProposalFolderUrl; // the detailed proposal description is inside this folder
+    string  private ProposalFolderUrl; // the detailed proposal description is inside this folder
     address private DAOOwner;
     address private MSNAddr;
 
-    mapping(address => string) private keepers; // who can create and manage proposals
+    mapping(address => string)  private keepers; // who can create and manage proposals
     mapping(address => uint256) private deposit; // depositor => amount
     mapping(address => uint256) private deposit_lasttime; // depositor => last vote time
-    uint256 voter_hold_secs; // how long in seconds to keep before voters withdraw
+    uint256 private voter_hold_secs; // how long in seconds to keep before voters withdraw
 
     constructor(address _MSNcontractAddr, uint256 _voter_hold_secs) {
         DAOOwner = msg.sender;
