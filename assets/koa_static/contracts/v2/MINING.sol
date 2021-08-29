@@ -118,7 +118,7 @@ contract MINING {
         emit remove_merkle_root_EVENT(msg.sender, merkleRoot, block.timestamp);
     }
 
-    function get_merkle_root(bytes32 merkleRoot) public view returns (uint256) {
+    function get_merkle_balance(bytes32 merkleRoot) public view returns (uint256) {
         return merkleRoots[merkleRoot];
     }
 
