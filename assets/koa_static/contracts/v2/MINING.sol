@@ -106,14 +106,18 @@ contract MINING {
         _;
     }
 
-    event add_merkle_root_EVENT(bytes32 merkleRoot, uint256 blocktime);
+    event add_merkle_root_EVENT(
+        bytes32 merkleRoot,
+        uint256 amount,
+        uint256 blocktime
+    );
 
-    function add_merkle_root(bytes32 merkleRoot, uint256 amount)
+    function set_merkle_root(bytes32 merkleRoot, uint256 amount)
         external
         onlyKeeper
     {
         merkleRoots[merkleRoot] = amount + 1; // +1 for never to 0 again
-        emit add_merkle_root_EVENT(merkleRoot, merkleRoots[merkleRoot]);
+        emit add_merkle_root_EVENT(merkleRoot, amount, block.timestamp);
     }
 
     event remove_merkle_root_EVENT(
@@ -152,10 +156,8 @@ contract MINING {
         require(claimed[merkleRoot][index] == false, "Already claimed");
 
         bytes32 leaf = keccak256(abi.encodePacked(index, msg.sender, amount));
-        require(
-            MerkleProof.verify(merkleProof, merkleRoot, leaf),
-            "Not verified"
-        );
+        bool verify = MerkleProof.verify(merkleProof, merkleRoot, leaf);
+        require(verify == true, "Not verified");
 
         require(merkleRoots[merkleRoot] > amount, "Not enough balance");
         merkleRoots[merkleRoot] -= amount;
