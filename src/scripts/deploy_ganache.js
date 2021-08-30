@@ -51,7 +51,6 @@ async function main() {
   ///make some  claim test data////
   
   const {MTree} =require('merkle-tree-util');
-  const {ethers}= require('ethers')
   
   let mtree=new MTree();
 
