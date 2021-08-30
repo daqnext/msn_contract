@@ -71,6 +71,7 @@ async function main() {
       index:i,
       account:Object.keys(account_pkeys)[i+3],
       key:account_pkeys[Object.keys(account_pkeys)[i+3]],
+      amount:100*(i+1),
       proof:mtree.gen_proof(i).proof
     });
   }
