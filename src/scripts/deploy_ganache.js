@@ -77,8 +77,6 @@ async function main() {
   }
 
   console.log("claim_test_data :",claim_test);
-
-  const fs = require('fs');
   fs.writeFileSync("assets/koa_static/claim_test_data.json", JSON.stringify(claim_test));
 }
 
