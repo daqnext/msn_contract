@@ -38,6 +38,7 @@
     "koa-router": "^10.0.0",
     "koa-static": "^5.0.0",
     "log4js": "^6.3.0",
+    "merkle-tree-util": "^1.0.3",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
     "mysql2": "^2.2.5",

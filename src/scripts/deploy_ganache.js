@@ -46,7 +46,42 @@ async function main() {
 
   const fs = require('fs');
   fs.writeFileSync("assets/koa_static/deployinfo.json", JSON.stringify(info));
+
+
+  ///make some  claim test data////
+  
+  const {MTree} =require('merkle-tree-util');
+  const {ethers}= require('ethers')
+  
+  let mtree=new MTree();
+
+  claim_test={
+    merkelRoot:'',
+    merkleProofs:[]
+  };
+
+  //wallet from 3 to 7
+  for(var i=0;i<5;i++){
+      mtree.addLeaf(Object.keys(account_pkeys)[i+3],100*(i+1));
+  }
+  mtree.build();
+  
+  claim_test.merkelRoot=mtree.get_root();
+  for(var i=0;i<5;i++){
+    claim_test.merkleProofs.push({
+      index:i,
+      account:Object.keys(account_pkeys)[i+3],
+      key:account_pkeys[Object.keys(account_pkeys)[i+3]],
+      proof:mtree.gen_proof(i)
+    });
+  }
+
+  console.log("claim_test_data :",claim_test);
+
+  const fs = require('fs');
+  fs.writeFileSync("assets/koa_static/claim_test_data.json", JSON.stringify(claim_test));
 }
+
 
 main()
   .then(() => process.exit(0))
