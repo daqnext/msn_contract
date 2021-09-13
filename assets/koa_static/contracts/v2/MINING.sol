@@ -26,7 +26,8 @@ contract MINING {
         _;
     }
 
-    event set_MiningOwner_EVENT(address oldOwner, address newOwner);
+    
+    event set_MiningOwner_EVENT( address trigger_user_addr,address oldOwner, address newOwner, uint256 blocktime);
 
     function set_MiningOwner(address _newOwner) external onlyMiningOwner {
         require(
@@ -37,7 +38,7 @@ contract MINING {
         delete keepers[oldMiningOwner];
         MiningOwner = _newOwner;
         keepers[_newOwner] = "MiningOwner";
-        emit set_MiningOwner_EVENT(oldMiningOwner, _newOwner);
+        emit set_MiningOwner_EVENT(msg.sender,oldMiningOwner, _newOwner,block.timestamp);
     }
 
     function get_MiningOwner() external view returns (address) {
@@ -53,10 +54,11 @@ contract MINING {
     }
 
     event withdraw_contract_EVENT(
+        address trigger_user_addr,
         address _from,
         address _to,
         uint256 amount,
-        uint256 time
+        uint256 blocktime
     );
 
     function withdraw_contract() public onlyMiningOwner {
@@ -64,6 +66,7 @@ contract MINING {
         require(left > 0, "No balance");
         IERC20(MSNAddr).transfer(msg.sender, left);
         emit withdraw_contract_EVENT(
+             msg.sender,
             address(this),
             msg.sender,
             left,
@@ -80,7 +83,7 @@ contract MINING {
         return keepers[keeper_addr];
     }
 
-    event add_keeper_EVENT(address keeper_addr, string keeper_name);
+    event add_keeper_EVENT( address trigger_user_addr,address keeper_addr, string keeper_name,uint256 blocktime);
 
     function add_keeper(address keeper_addr, string calldata keeper_name)
         external
@@ -88,17 +91,17 @@ contract MINING {
     {
         require(bytes(keeper_name).length != 0, "No name");
         keepers[keeper_addr] = keeper_name;
-        emit add_keeper_EVENT(keeper_addr, keeper_name);
+        emit add_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
     }
 
-    event remove_keeper_EVENT(address keeper_addr, string keeper_name);
+    event remove_keeper_EVENT(address trigger_user_addr,address keeper_addr, string keeper_name,uint256 blocktime);
 
     function remove_keeper(address keeper_addr) external onlyMiningOwner {
         require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
         require(keeper_addr != MiningOwner, "Can not delete MiningOwner");
         string memory keeper_name = keepers[keeper_addr];
         delete keepers[keeper_addr];
-        emit remove_keeper_EVENT(keeper_addr, keeper_name);
+        emit remove_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
     }
 
     modifier onlyKeeper() {
@@ -107,6 +110,7 @@ contract MINING {
     }
 
     event add_merkle_root_EVENT(
+        address trigger_user_addr,
         bytes32 merkleRoot,
         uint256 amount,
         uint256 blocktime
@@ -117,11 +121,11 @@ contract MINING {
         onlyKeeper
     {
         merkleRoots[merkleRoot] = amount + 1; // +1 for never to 0 again
-        emit add_merkle_root_EVENT(merkleRoot, amount, block.timestamp);
+        emit add_merkle_root_EVENT(msg.sender,merkleRoot, amount, block.timestamp);
     }
 
     event remove_merkle_root_EVENT(
-        address _from,
+        address trigger_user_addr,
         bytes32 merkleRoot,
         uint256 blocktime
     );
@@ -140,8 +144,8 @@ contract MINING {
     }
 
     event claim_erc20_EVENT(
+        address trigger_user_addr,
         bytes32 merkleRoot,
-        address to,
         uint256 amount,
         uint256 time
     );
@@ -165,7 +169,7 @@ contract MINING {
         claimed[merkleRoot][index] = true;
         bool result = IERC20(MSNAddr).transfer(msg.sender, amount);
         require(result == true, "transfer error");
-        emit claim_erc20_EVENT(merkleRoot, msg.sender, amount, block.timestamp);
+        emit claim_erc20_EVENT( msg.sender,merkleRoot, amount, block.timestamp);
     }
 
     receive() external payable {

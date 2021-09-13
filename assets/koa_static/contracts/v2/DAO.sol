@@ -40,7 +40,7 @@ contract DAO {
         _;
     }
 
-    event change_DAOOwner_EVENT(address oldOwner, address newOwner);
+    event change_DAOOwner_EVENT(address trigger_user_addr,address oldOwner, address newOwner,uint256 blocktime);
 
     function change_DAOOwner(address _newOwner) external onlyDAOOwner {
         require(
@@ -51,7 +51,7 @@ contract DAO {
         delete keepers[oldDAOOwner];
         DAOOwner = _newOwner;
         keepers[_newOwner] = "DAOOwner";
-        emit change_DAOOwner_EVENT(oldDAOOwner, _newOwner);
+        emit change_DAOOwner_EVENT(msg.sender,oldDAOOwner, _newOwner,block.timestamp);
     }
 
     function get_DAOOwner() external view returns (address) {
@@ -67,10 +67,10 @@ contract DAO {
     }
 
     event withdraw_contract_EVENT(
+        address trigger_user_addr,
         address _from,
-        address _to,
         uint256 amount,
-        uint256 time
+        uint256 blocktime
     );
 
     function withdraw_contract() public onlyDAOOwner {
@@ -78,8 +78,8 @@ contract DAO {
         require(left > 0, "No Balance");
         IERC20(MSNAddr).transfer(msg.sender, left);
         emit withdraw_contract_EVENT(
-            address(this),
             msg.sender,
+            address(this),
             left,
             block.timestamp
         );
@@ -90,7 +90,7 @@ contract DAO {
         _;
     }
 
-    event add_keeper_EVENT(address keeper_addr, string keeper_name);
+    event add_keeper_EVENT(address trigger_user_addr,address keeper_addr, string keeper_name, uint256 blocktime);
 
     function add_keeper(address keeper_addr, string calldata keeper_name)
         external
@@ -98,7 +98,7 @@ contract DAO {
     {
         require(bytes(keeper_name).length != 0, "No name");
         keepers[keeper_addr] = keeper_name;
-        emit add_keeper_EVENT(keeper_addr, keeper_name);
+        emit add_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
     }
 
     function get_keeper(address keeper_addr)
@@ -110,14 +110,14 @@ contract DAO {
         return keepers[keeper_addr];
     }
 
-    event remove_keeper_EVENT(address keeper_addr, string keeper_name);
+    event remove_keeper_EVENT(address trigger_user_addr,address keeper_addr, string keeper_name,uint256 blocktime);
 
     function remove_keeper(address keeper_addr) external onlyDAOOwner {
         require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
         require(keeper_addr != DAOOwner, "Can not delete DAOOwner");
         string memory keeper_name = keepers[keeper_addr];
         delete keepers[keeper_addr];
-        emit remove_keeper_EVENT(keeper_addr, keeper_name);
+        emit remove_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
     }
 
     function set_voter_hold_secs(uint256 secs) public onlyDAOOwner {
@@ -133,10 +133,11 @@ contract DAO {
     }
 
     event set_proposal_EVENT(
+        address trigger_user_addr,
         uint16 _pid,
-        address _creator,
         uint256 _startTime,
-        uint256 _endTime
+        uint256 _endTime,
+        uint256 blocktime
     );
 
     function set_proposal(
@@ -154,10 +155,10 @@ contract DAO {
             "StartTime must be smaller than endTime"
         );
         proposals[_pid] = Proposal(_pid, msg.sender, _startTime, _endTime);
-        emit set_proposal_EVENT(_pid, msg.sender, _startTime, _endTime);
+        emit set_proposal_EVENT(msg.sender,_pid,  _startTime, _endTime,block.timestamp);
     }
 
-    event remove_proposal_EVENT(address _from, uint16 _pid);
+    event remove_proposal_EVENT(address trigger_user_addr, uint16 _pid,uint256 blocktime);
 
     function remove_proposal(uint16 _pid) external onlyKeeper {
         require(proposals[_pid].pid != 0, "The proposal doesn't exist");
@@ -166,7 +167,7 @@ contract DAO {
             "No permission to remove the proposal"
         );
         delete proposals[_pid];
-        emit remove_proposal_EVENT(msg.sender, _pid);
+        emit remove_proposal_EVENT(msg.sender, _pid,block.timestamp);
     }
 
     function get_proposal(uint16 _pid)
@@ -188,7 +189,7 @@ contract DAO {
         );
     }
 
-    event deposit_all_EVENT(address _from, uint256 amount);
+    event deposit_all_EVENT(address trigger_user_addr, uint256 amount,uint256 blocktime);
 
     function deposit_all() external {
         uint256 allowance = IERC20(MSNAddr).allowance(
@@ -205,7 +206,7 @@ contract DAO {
 
         deposit[msg.sender] += allowance;
         deposit_lasttime[msg.sender] = block.timestamp;
-        emit deposit_all_EVENT(msg.sender, allowance);
+        emit deposit_all_EVENT(msg.sender, allowance,block.timestamp);
     }
 
     function get_deposit(address addr) public view returns (uint256) {
@@ -216,7 +217,7 @@ contract DAO {
         return deposit_lasttime[addr];
     }
 
-    event voter_withdraw_all_EVENT(address _from, uint256 amount);
+    event voter_withdraw_all_EVENT(address trigger_user_addr, uint256 amount,uint256 blocktime);
 
     function voter_withdraw_all() external {
         require(
@@ -228,15 +229,15 @@ contract DAO {
         deposit[msg.sender] = 0;
         bool t_result = IERC20(MSNAddr).transfer(msg.sender, d_amount);
         require(t_result == true, "transfer error");
-        emit voter_withdraw_all_EVENT(msg.sender, d_amount);
+        emit voter_withdraw_all_EVENT(msg.sender, d_amount,block.timestamp);
     }
 
     event vote_EVENT(
-        uint16 _pid,
-        address _voter,
+        address trigger_user_addr,
+        uint16 _pid,   
         uint8 _option,
         uint256 _all_votes,
-        uint256 _vote_time
+        uint256 blocktime
     );
 
     function vote(uint16 _pid, uint8 _option) external {
@@ -257,8 +258,8 @@ contract DAO {
         proposal_votes[_pid][_option] += deposit[msg.sender];
 
         emit vote_EVENT(
-            _pid,
-            msg.sender,
+             msg.sender,
+            _pid,    
             _option,
             proposal_votes[_pid][_option],
             block.timestamp
