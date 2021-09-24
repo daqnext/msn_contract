@@ -8,6 +8,13 @@
 #### 3.MSN-MINING is for meson.network mining 
 #### 2.MSN-DAO for Governance
 
+### build all the contract 
+```
+npm run build
+all the build files are located at assets/koa_static/contract_build/v2/
+```
+
+
 ### for easy test over ganache chain
 #### ```npm run run_ganache```
 #### ```npm run deploy_ganache```

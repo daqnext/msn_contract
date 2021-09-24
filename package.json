@@ -4,12 +4,10 @@
   "description": "meson network token contracts",
   "main": "index.js",
   "scripts": {
-    "build": "waffle ",
+    "build": "waffle",
     "test": "waffle & mocha  ./test/*.js --timeout 15000 --exit",
-    "dev": "waffle & nodemon ./src/main.js",
-    "run_ganache": "ganache-cli --host finance.daqnext.com --chainId 1337 --account_keys_path ./assets/koa_static/keys.json",
-    "deploy_ganache": "hardhat run ./src/scripts/deploy_ganache.js --network ganache ",
-    "prod": "waffle & pm2 start pm2.json"
+    "run_ganache": "ganache-cli --host ganache.finance.daqnext.com --chainId 1337 --account_keys_path ./assets/koa_static/keys.json",
+    "deploy_ganache": "hardhat run ./src/scripts/deploy_ganache.js --network ganache "
   },
   "repository": {
     "type": "git",
@@ -43,7 +41,6 @@
     "moment": "^2.29.1",
     "mysql2": "^2.2.5",
     "nodemailer": "^6.6.3",
-    "pm2": "^5.1.0",
     "randomstring": "^1.2.1"
   },
   "devDependencies": {

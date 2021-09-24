@@ -26,7 +26,7 @@ async function main() {
   var account_pkeys=keysjson.private_keys;
 
   var info={};
-  info.endpoint='finance.daqnext.com:8545';
+  info.endpoint='ganache.finance.daqnext.com:8545';
   info.chainid=chainid;
 
   info.MSN=msn.address;

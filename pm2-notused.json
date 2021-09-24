@@ -1,0 +1,27 @@
+{
+    "apps": [
+                {
+                        "name": "msn_contract",
+                        "script": "./src/main.js",
+                        "cwd": "",
+                        "env": {
+                            "NODE_ENV": "production"
+                        },
+                        "watch": [
+                            "./src"
+                        ],
+                        "ignore_watch": [
+                                
+                        ],
+                        "merge_logs": true,
+                        "args":["--config=prod"],
+                        "instances": "max",
+                        "exec_mode": "cluster",
+                        "error_file": "./log/pm2_error.log",
+                        "out_file":   "./log/pm2_out.log",
+                        "log_date_format": "YYYY-MM-DD HH:mm:ss",
+                        "restart_delay": 5000
+                    }
+            ]
+
+}
