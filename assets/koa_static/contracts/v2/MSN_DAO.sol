@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract DAO {
+contract MSN_DAO {
     uint256 payable_amount;
 
     struct Proposal {

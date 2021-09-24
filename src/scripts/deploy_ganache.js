@@ -11,12 +11,12 @@ async function main() {
   console.log("MSNTT deployed to:", msn.address);
 
 
-  const MINING = await ethers.getContractFactory("MINING",accounts[1]);
+  const MINING = await ethers.getContractFactory("MSN_MINING",accounts[1]);
   const mining = await MINING.deploy(msn.address);
   console.log("MINING deployed to:", mining.address);
 
 
-  const DAO = await ethers.getContractFactory("DAO",accounts[2]);
+  const DAO = await ethers.getContractFactory("MSN_DAO",accounts[2]);
   //const dao = await DAO.deploy(msn.address,3600*24*3);    //3 days
   const dao = await DAO.deploy(msn.address,300);//5mins for easy testing 
   console.log("DAO deployed to:", dao.address);
@@ -26,7 +26,7 @@ async function main() {
   var account_pkeys=keysjson.private_keys;
 
   var info={};
-  info.endpoint='54.219.243.224:8545';
+  info.endpoint='finance.daqnext.com:8545';
   info.chainid=chainid;
 
   info.MSN=msn.address;
