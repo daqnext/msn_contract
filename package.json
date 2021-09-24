@@ -8,7 +8,7 @@
     "test": "waffle & mocha  ./test/*.js --timeout 15000 --exit",
     "run_ganache": "ganache-cli --host `hostname -I` --chainId 1337 --account_keys_path ./assets/koa_static/keys.json",
     "deploy_ganache": "hardhat run ./src/scripts/deploy_ganache.js --network ganache ",
-    "dev": "waffle & nodemon ./src/main.js"
+    "dev": "waffle & node ./src/main.js"
   },
   "repository": {
     "type": "git",
