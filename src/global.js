@@ -18,29 +18,6 @@ let koaApp = new koa();
 let koaRouter = new router();
 
 
-
-////////////global ioredis////////////
-const redis = new ioredis({
-    port:args.redis_port,
-    host:args.redis_host,
-    family:args.redis_family,
-    db:args.redis_db,
-    //password:args.redis_password, 
-});
-
-// Create the connection pool. The pool-specific settings are the defaults
-let sqlpool = mysql.createPool({
-    host: args.db_host,
-    user: args.db_username,
-    password:args.db_password,
-    database: args.db_name,
-    waitForConnections: true,
-    connectionLimit: args.db_pool_num,
-    queueLimit: 0
-}).promise();
-
-
-
 ///////////global log4js//////////////
 log4js.configure({
     appenders: {
