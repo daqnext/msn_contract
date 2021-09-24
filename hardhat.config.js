@@ -6,7 +6,7 @@ module.exports = {
   defaultNetwork: "ganache",
   networks: {
     ganache: {
-      url: `HTTP://172.31.0.107:8545`,
+      url: `HTTP://ganache.finance.daqnext.com:8545`,
       accounts: Object.values(account_pkeys),//['0x'+p_key], 
     },
   },

@@ -3,6 +3,12 @@
 
 #### this program can only run on linux server , mac,windows (not supported!)
 
+#### before you start please make sure 
+```
+ganache.finance.daqnext.com  domain points to your linux server public ip
+as that domain is used to connect to the ganache chain to deploy the contracts
+```
+
 #### please run below commands on your linux server
 ```
 npm run build
