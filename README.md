@@ -17,7 +17,9 @@ npm run deploy_ganache
 ```
 
 ### after running you could enjoy the ganache chain over:
-
+```
+http://ganache.finance.daqnext.com:8080/deployinfo.json
+```
 
 ### contracts are located in /assets/koa_static/contracts
 ### v1 is deprecated please use v2
