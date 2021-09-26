@@ -7,6 +7,8 @@
  #### 4 for MINING contract itself
  #### 5 for DAO contract creator
  #### 6 fro DAO contract itself
- #### 7~ 1000 currently reserved  for other contracts in the future
- ###  1001 ~ above for internal maintainers 
+
+ #### 7~ 100 currently reserved  for other contracts in the future
+ ###  100 ~ 200 above for internal maintainers 
+ ###  200 ~ 255 reserved not use now 
 
