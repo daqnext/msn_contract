@@ -1,3 +1,5 @@
+
+```
 ///////////MSN//////////////////////////////////
 
 add_special_EVENT(address,address,uint8,uint256)
@@ -37,3 +39,5 @@ remove_proposal_EVENT(address,uint16,uint256)
 vote_EVENT(address,uint16,uint8,uint256,uint256)
 deposit_token_EVENT(address,uint256,uint256)
 withdraw_token_EVENT(address,uint256,uint256)
+
+```
