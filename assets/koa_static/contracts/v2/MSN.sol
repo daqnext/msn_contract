@@ -200,8 +200,7 @@ contract MSN is ERC20 {
         emit withdraw_eth_EVENT(msg.sender, amout_to_t, block.timestamp);
     }
 
-
-      event withdraw_contract_EVENT(
+    event withdraw_contract_EVENT(
         address trigger_user_addr,
         address _from,
         address _to,
@@ -212,7 +211,7 @@ contract MSN is ERC20 {
     function withdraw_contract() public onlyContractOwner {
         uint256 left = balanceOf(address(this));
         require(left > 0, "No balance");
-        _transfer(address(this),msg.sender,left);
+        _transfer(address(this), msg.sender, left);
         emit withdraw_contract_EVENT(
             msg.sender,
             address(this),
@@ -221,5 +220,4 @@ contract MSN is ERC20 {
             block.timestamp
         );
     }
-
 }
