@@ -211,10 +211,11 @@ contract MSN_MINING {
     event stack_token_EVENT(
         address trigger_user_addr,
         uint256 amount,
+        string userid,
         uint256 blocktime
     );
 
-    function stack_token(uint256 amount) external {
+    function stack_token(uint256 amount, string calldata userid) external {
         uint256 allowance = IERC20(MSNAddr).allowance(
             msg.sender,
             address(this)
@@ -228,26 +229,26 @@ contract MSN_MINING {
         require(t_result == true, "transfer error");
 
         stacking[msg.sender] += amount;
-        emit stack_token_EVENT(msg.sender, amount, block.timestamp);
+        emit stack_token_EVENT(msg.sender, amount, userid, block.timestamp);
     }
 
     function get_stack(address addr) public view returns (uint256) {
         return stacking[addr];
     }
 
-    event unstack_token_EVENT(
+    event unstack_all_token_EVENT(
         address trigger_user_addr,
         uint256 amount,
         uint256 blocktime
     );
 
-    function unstack_token(uint256 amount) external {
+    function unstack_all_token() external {
         uint256 s_amount = stacking[msg.sender];
-        require(s_amount >= amount, "not enough to unstack");
-        stacking[msg.sender] = s_amount - amount;
-        bool t_result = IERC20(MSNAddr).transfer(msg.sender, amount);
+        require(s_amount > 0, "no stacking");
+        stacking[msg.sender] = 0;
+        bool t_result = IERC20(MSNAddr).transfer(msg.sender, s_amount);
         require(t_result == true, "transfer error");
-        emit unstack_token_EVENT(msg.sender, amount, block.timestamp);
+        emit unstack_all_token_EVENT(msg.sender, s_amount, block.timestamp);
     }
 
     receive() external payable {
