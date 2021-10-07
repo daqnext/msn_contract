@@ -15,6 +15,8 @@ contract MSN_MINING {
     mapping(bytes32 => uint256) private merkleRoots; // merkleRoot=>balance
     mapping(bytes32 => mapping(uint256 => bool)) private claimed; //bytes32 merkleRoot => (index => true|false)
 
+    mapping(address => uint256) private stacking;
+
     constructor(address _MSNcontractAddr) {
         MiningOwner = msg.sender;
         MSNAddr = _MSNcontractAddr;
@@ -26,8 +28,12 @@ contract MSN_MINING {
         _;
     }
 
-    
-    event set_MiningOwner_EVENT( address trigger_user_addr,address oldOwner, address newOwner, uint256 blocktime);
+    event set_MiningOwner_EVENT(
+        address trigger_user_addr,
+        address oldOwner,
+        address newOwner,
+        uint256 blocktime
+    );
 
     function set_MiningOwner(address _newOwner) external onlyMiningOwner {
         require(
@@ -38,7 +44,12 @@ contract MSN_MINING {
         delete keepers[oldMiningOwner];
         MiningOwner = _newOwner;
         keepers[_newOwner] = "MiningOwner";
-        emit set_MiningOwner_EVENT(msg.sender,oldMiningOwner, _newOwner,block.timestamp);
+        emit set_MiningOwner_EVENT(
+            msg.sender,
+            oldMiningOwner,
+            _newOwner,
+            block.timestamp
+        );
     }
 
     function get_MiningOwner() external view returns (address) {
@@ -66,7 +77,7 @@ contract MSN_MINING {
         require(left > 0, "No balance");
         IERC20(MSNAddr).transfer(msg.sender, left);
         emit withdraw_contract_EVENT(
-             msg.sender,
+            msg.sender,
             address(this),
             msg.sender,
             left,
@@ -83,7 +94,12 @@ contract MSN_MINING {
         return keepers[keeper_addr];
     }
 
-    event add_keeper_EVENT( address trigger_user_addr,address keeper_addr, string keeper_name,uint256 blocktime);
+    event add_keeper_EVENT(
+        address trigger_user_addr,
+        address keeper_addr,
+        string keeper_name,
+        uint256 blocktime
+    );
 
     function add_keeper(address keeper_addr, string calldata keeper_name)
         external
@@ -91,17 +107,32 @@ contract MSN_MINING {
     {
         require(bytes(keeper_name).length != 0, "No name");
         keepers[keeper_addr] = keeper_name;
-        emit add_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
+        emit add_keeper_EVENT(
+            msg.sender,
+            keeper_addr,
+            keeper_name,
+            block.timestamp
+        );
     }
 
-    event remove_keeper_EVENT(address trigger_user_addr,address keeper_addr, string keeper_name,uint256 blocktime);
+    event remove_keeper_EVENT(
+        address trigger_user_addr,
+        address keeper_addr,
+        string keeper_name,
+        uint256 blocktime
+    );
 
     function remove_keeper(address keeper_addr) external onlyMiningOwner {
         require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
         require(keeper_addr != MiningOwner, "Can not delete MiningOwner");
         string memory keeper_name = keepers[keeper_addr];
         delete keepers[keeper_addr];
-        emit remove_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
+        emit remove_keeper_EVENT(
+            msg.sender,
+            keeper_addr,
+            keeper_name,
+            block.timestamp
+        );
     }
 
     modifier onlyKeeper() {
@@ -121,7 +152,12 @@ contract MSN_MINING {
         onlyKeeper
     {
         merkleRoots[merkleRoot] = amount + 1; // +1 for never to 0 again
-        emit add_merkle_root_EVENT(msg.sender,merkleRoot, amount, block.timestamp);
+        emit add_merkle_root_EVENT(
+            msg.sender,
+            merkleRoot,
+            amount,
+            block.timestamp
+        );
     }
 
     event remove_merkle_root_EVENT(
@@ -169,7 +205,49 @@ contract MSN_MINING {
         claimed[merkleRoot][index] = true;
         bool result = IERC20(MSNAddr).transfer(msg.sender, amount);
         require(result == true, "transfer error");
-        emit claim_erc20_EVENT( msg.sender,merkleRoot, amount, block.timestamp);
+        emit claim_erc20_EVENT(msg.sender, merkleRoot, amount, block.timestamp);
+    }
+
+    event stack_token_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
+
+    function stack_token(uint256 amount) external {
+        uint256 allowance = IERC20(MSNAddr).allowance(
+            msg.sender,
+            address(this)
+        );
+        require(allowance > 0, "Not allowed");
+        bool t_result = IERC20(MSNAddr).transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
+        require(t_result == true, "transfer error");
+
+        stacking[msg.sender] += amount;
+        emit stack_token_EVENT(msg.sender, amount, block.timestamp);
+    }
+
+    function get_stack(address addr) public view returns (uint256) {
+        return stacking[addr];
+    }
+
+    event unstack_token_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
+
+    function unstack_token(uint256 amount) external {
+        uint256 s_amount = stacking[msg.sender];
+        require(s_amount >= amount, "not enough to unstack");
+        stacking[msg.sender] = s_amount - amount;
+        bool t_result = IERC20(MSNAddr).transfer(msg.sender, amount);
+        require(t_result == true, "transfer error");
+        emit unstack_token_EVENT(msg.sender, amount, block.timestamp);
     }
 
     receive() external payable {

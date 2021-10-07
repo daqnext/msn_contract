@@ -29,7 +29,12 @@ contract MSN is ERC20 {
         _mint(msg.sender, inisupply * (10**uint256(decimals())));
     }
 
-    event add_special_EVENT(address trigger_user_addr,address special_addr, uint8 _id,uint256 blocktime);
+    event add_special_EVENT(
+        address trigger_user_addr,
+        address special_addr,
+        uint8 _id,
+        uint256 blocktime
+    );
 
     function add_special(address special_addr, uint8 _id)
         external
@@ -41,10 +46,15 @@ contract MSN is ERC20 {
 
         special_list[special_addr] = _id;
         special_list_idmap[_id] = special_addr;
-        emit add_special_EVENT(msg.sender,special_addr,_id,block.timestamp);
+        emit add_special_EVENT(msg.sender, special_addr, _id, block.timestamp);
     }
 
-    event remove_special_EVENT(address trigger_user_addr,address special_addr, uint16 _special_id,uint256 blocktime);
+    event remove_special_EVENT(
+        address trigger_user_addr,
+        address special_addr,
+        uint16 _special_id,
+        uint256 blocktime
+    );
 
     function remove_special(address special_addr) external onlyContractOwner {
         require(special_list[special_addr] > 0, "No such special");
@@ -55,7 +65,12 @@ contract MSN is ERC20 {
         uint16 special_id = special_list[special_addr];
         delete special_list[special_addr];
         delete special_list_idmap[special_id];
-        emit remove_special_EVENT(msg.sender,special_addr, special_id,block.timestamp);
+        emit remove_special_EVENT(
+            msg.sender,
+            special_addr,
+            special_id,
+            block.timestamp
+        );
     }
 
     function get_special(address special_addr) external view returns (uint16) {
@@ -69,31 +84,47 @@ contract MSN is ERC20 {
     }
 
     // mint is open for mining inflation increment
-    event mint_EVENT(address trigger_user_addr, uint256 amount,uint256 blocktime);
+    event mint_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
 
     function mint(uint256 amount) public onlyContractOwner {
         _mint(msg.sender, amount);
-        emit mint_EVENT(msg.sender, amount,block.timestamp);
+        emit mint_EVENT(msg.sender, amount, block.timestamp);
     }
 
     // anyone can burn their own token
-    event burn_EVENT(address trigger_user_addr, uint256 amount,uint256 blocktime);
+    event burn_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
 
     function burn(uint256 amount) external {
         _burn(msg.sender, amount);
-        emit burn_EVENT(msg.sender, amount,block.timestamp);
+        emit burn_EVENT(msg.sender, amount, block.timestamp);
     }
 
-    event set_exchange_open_EVENT(address trigger_user_addr, bool exchange_open,uint256 blocktime);
+    event set_exchange_open_EVENT(
+        address trigger_user_addr,
+        bool exchange_open,
+        uint256 blocktime
+    );
+
     function set_exchange_open(bool _exchange_open) external onlyContractOwner {
         exchange_open = _exchange_open;
-        emit set_exchange_open_EVENT(msg.sender, exchange_open,block.timestamp);
+        emit set_exchange_open_EVENT(
+            msg.sender,
+            exchange_open,
+            block.timestamp
+        );
     }
 
     function get_exchange_open() public view returns (bool) {
         return exchange_open;
     }
-    
 
     //overwrite to inject the modifier
     function _approve(
@@ -116,6 +147,8 @@ contract MSN is ERC20 {
         address _sender,
         address _recipient,
         uint256 _amount,
+        uint16 from_special,
+        uint16 to_special,
         uint256 blocktime
     );
 
@@ -139,6 +172,8 @@ contract MSN is ERC20 {
                 sender,
                 recipient,
                 amount,
+                special_list[sender],
+                special_list[recipient],
                 block.timestamp
             );
         }
@@ -152,17 +187,39 @@ contract MSN is ERC20 {
         payable_amount += msg.value;
     }
 
-
     event withdraw_eth_EVENT(
-            address trigger_user_addr,
-            uint256 _amount,
-            uint256 blocktime
-        );
+        address trigger_user_addr,
+        uint256 _amount,
+        uint256 blocktime
+    );
 
     function withdraw_eth() external onlyContractOwner {
-        uint256  amout_to_t=address(this).balance;
+        uint256 amout_to_t = address(this).balance;
         payable(msg.sender).transfer(amout_to_t);
         payable_amount = 0;
-        emit withdraw_eth_EVENT(msg.sender, amout_to_t,block.timestamp);
+        emit withdraw_eth_EVENT(msg.sender, amout_to_t, block.timestamp);
     }
+
+
+      event withdraw_contract_EVENT(
+        address trigger_user_addr,
+        address _from,
+        address _to,
+        uint256 amount,
+        uint256 blocktime
+    );
+
+    function withdraw_contract() public onlyContractOwner {
+        uint256 left = balanceOf(address(this));
+        require(left > 0, "No balance");
+        _transfer(address(this),msg.sender,left);
+        emit withdraw_contract_EVENT(
+            msg.sender,
+            address(this),
+            msg.sender,
+            left,
+            block.timestamp
+        );
+    }
+
 }

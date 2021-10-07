@@ -19,11 +19,11 @@ contract MSN_DAO {
     mapping(uint16 => mapping(uint8 => uint256)) private proposal_votes; // pid => (option => total_votes)
     mapping(address => mapping(uint16 => uint8)) private votes; // voter => (pid => selected option), selected option should start from 1
 
-    string  private ProposalFolderUrl; // the detailed proposal description is inside this folder
+    string private ProposalFolderUrl; // the detailed proposal description is inside this folder
     address private DAOOwner;
     address private MSNAddr;
 
-    mapping(address => string)  private keepers; // who can create and manage proposals
+    mapping(address => string) private keepers; // who can create and manage proposals
     mapping(address => uint256) private deposit; // depositor => amount
     mapping(address => uint256) private deposit_lasttime; // depositor => last vote time
     uint256 private voter_hold_secs; // how long in seconds to keep before voters withdraw
@@ -40,7 +40,12 @@ contract MSN_DAO {
         _;
     }
 
-    event change_DAOOwner_EVENT(address trigger_user_addr,address oldOwner, address newOwner,uint256 blocktime);
+    event change_DAOOwner_EVENT(
+        address trigger_user_addr,
+        address oldOwner,
+        address newOwner,
+        uint256 blocktime
+    );
 
     function change_DAOOwner(address _newOwner) external onlyDAOOwner {
         require(
@@ -51,7 +56,12 @@ contract MSN_DAO {
         delete keepers[oldDAOOwner];
         DAOOwner = _newOwner;
         keepers[_newOwner] = "DAOOwner";
-        emit change_DAOOwner_EVENT(msg.sender,oldDAOOwner, _newOwner,block.timestamp);
+        emit change_DAOOwner_EVENT(
+            msg.sender,
+            oldDAOOwner,
+            _newOwner,
+            block.timestamp
+        );
     }
 
     function get_DAOOwner() external view returns (address) {
@@ -90,7 +100,12 @@ contract MSN_DAO {
         _;
     }
 
-    event add_keeper_EVENT(address trigger_user_addr,address keeper_addr, string keeper_name, uint256 blocktime);
+    event add_keeper_EVENT(
+        address trigger_user_addr,
+        address keeper_addr,
+        string keeper_name,
+        uint256 blocktime
+    );
 
     function add_keeper(address keeper_addr, string calldata keeper_name)
         external
@@ -98,7 +113,12 @@ contract MSN_DAO {
     {
         require(bytes(keeper_name).length != 0, "No name");
         keepers[keeper_addr] = keeper_name;
-        emit add_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
+        emit add_keeper_EVENT(
+            msg.sender,
+            keeper_addr,
+            keeper_name,
+            block.timestamp
+        );
     }
 
     function get_keeper(address keeper_addr)
@@ -110,14 +130,24 @@ contract MSN_DAO {
         return keepers[keeper_addr];
     }
 
-    event remove_keeper_EVENT(address trigger_user_addr,address keeper_addr, string keeper_name,uint256 blocktime);
+    event remove_keeper_EVENT(
+        address trigger_user_addr,
+        address keeper_addr,
+        string keeper_name,
+        uint256 blocktime
+    );
 
     function remove_keeper(address keeper_addr) external onlyDAOOwner {
         require(bytes(keepers[keeper_addr]).length != 0, "No such a keeper");
         require(keeper_addr != DAOOwner, "Can not delete DAOOwner");
         string memory keeper_name = keepers[keeper_addr];
         delete keepers[keeper_addr];
-        emit remove_keeper_EVENT(msg.sender,keeper_addr, keeper_name,block.timestamp);
+        emit remove_keeper_EVENT(
+            msg.sender,
+            keeper_addr,
+            keeper_name,
+            block.timestamp
+        );
     }
 
     function set_voter_hold_secs(uint256 secs) public onlyDAOOwner {
@@ -155,10 +185,20 @@ contract MSN_DAO {
             "StartTime must be smaller than endTime"
         );
         proposals[_pid] = Proposal(_pid, msg.sender, _startTime, _endTime);
-        emit set_proposal_EVENT(msg.sender,_pid,  _startTime, _endTime,block.timestamp);
+        emit set_proposal_EVENT(
+            msg.sender,
+            _pid,
+            _startTime,
+            _endTime,
+            block.timestamp
+        );
     }
 
-    event remove_proposal_EVENT(address trigger_user_addr, uint16 _pid,uint256 blocktime);
+    event remove_proposal_EVENT(
+        address trigger_user_addr,
+        uint16 _pid,
+        uint256 blocktime
+    );
 
     function remove_proposal(uint16 _pid) external onlyKeeper {
         require(proposals[_pid].pid != 0, "The proposal doesn't exist");
@@ -167,7 +207,7 @@ contract MSN_DAO {
             "No permission to remove the proposal"
         );
         delete proposals[_pid];
-        emit remove_proposal_EVENT(msg.sender, _pid,block.timestamp);
+        emit remove_proposal_EVENT(msg.sender, _pid, block.timestamp);
     }
 
     function get_proposal(uint16 _pid)
@@ -189,24 +229,28 @@ contract MSN_DAO {
         );
     }
 
-    event deposit_all_EVENT(address trigger_user_addr, uint256 amount,uint256 blocktime);
+    event deposit_token_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
 
-    function deposit_all() external {
+    function deposit_token(uint256 amount) external {
         uint256 allowance = IERC20(MSNAddr).allowance(
             msg.sender,
             address(this)
         );
-        require(allowance > 0, "No deposit");
+        require(allowance > 0, "Not allowed");
         bool t_result = IERC20(MSNAddr).transferFrom(
             msg.sender,
             address(this),
-            allowance
+            amount
         );
         require(t_result == true, "transfer error");
 
-        deposit[msg.sender] += allowance;
+        deposit[msg.sender] += amount;
         deposit_lasttime[msg.sender] = block.timestamp;
-        emit deposit_all_EVENT(msg.sender, allowance,block.timestamp);
+        emit deposit_token_EVENT(msg.sender, amount, block.timestamp);
     }
 
     function get_deposit(address addr) public view returns (uint256) {
@@ -217,24 +261,28 @@ contract MSN_DAO {
         return deposit_lasttime[addr];
     }
 
-    event voter_withdraw_all_EVENT(address trigger_user_addr, uint256 amount,uint256 blocktime);
+    event withdraw_token_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
 
-    function voter_withdraw_all() external {
+    function withdraw_token(uint256 amount) external {
         require(
             deposit_lasttime[msg.sender] + voter_hold_secs < block.timestamp,
             "Not enough time"
         );
         uint256 d_amount = deposit[msg.sender];
-        require(d_amount > 0, " No deposit");
-        deposit[msg.sender] = 0;
-        bool t_result = IERC20(MSNAddr).transfer(msg.sender, d_amount);
+        require(d_amount >= amount, "not enough to withdraw");
+        deposit[msg.sender] = d_amount - amount;
+        bool t_result = IERC20(MSNAddr).transfer(msg.sender, amount);
         require(t_result == true, "transfer error");
-        emit voter_withdraw_all_EVENT(msg.sender, d_amount,block.timestamp);
+        emit withdraw_token_EVENT(msg.sender, amount, block.timestamp);
     }
 
     event vote_EVENT(
         address trigger_user_addr,
-        uint16 _pid,   
+        uint16 _pid,
         uint8 _option,
         uint256 _all_votes,
         uint256 blocktime
@@ -258,8 +306,8 @@ contract MSN_DAO {
         proposal_votes[_pid][_option] += deposit[msg.sender];
 
         emit vote_EVENT(
-             msg.sender,
-            _pid,    
+            msg.sender,
+            _pid,
             _option,
             proposal_votes[_pid][_option],
             block.timestamp
