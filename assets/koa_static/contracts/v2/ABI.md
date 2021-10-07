@@ -23,12 +23,10 @@ remove_keeper_EVENT(address,address,string,uint256)
 add_merkle_root_EVENT(address,bytes32,uint256,uint256)
 remove_merkle_root_EVENT(address,bytes32,uint256)
 claim_erc20_EVENT(address,bytes32,uint256,uint256)
-stack_token_EVENT(address,uint256,uint256)
-unstack_token_EVENT(address,uint256,uint256)
-
+stack_token_EVENT(address,uint256,string,uint256)
+unstack_all_token_EVENT(address,uint256,uint256)
 
 /////////// MSN_DAO //////////////
-
 
 change_DAOOwner_EVENT(address,address,address,uint256)
 withdraw_contract_EVENT(address,address,uint256,uint256)
