@@ -203,7 +203,6 @@ contract MSN is ERC20 {
     event withdraw_contract_EVENT(
         address trigger_user_addr,
         address _from,
-        address _to,
         uint256 amount,
         uint256 blocktime
     );
@@ -215,7 +214,6 @@ contract MSN is ERC20 {
         emit withdraw_contract_EVENT(
             msg.sender,
             address(this),
-            msg.sender,
             left,
             block.timestamp
         );

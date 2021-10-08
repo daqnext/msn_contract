@@ -76,25 +76,6 @@ contract MSN_DAO {
         return ProposalFolderUrl;
     }
 
-    event withdraw_contract_EVENT(
-        address trigger_user_addr,
-        address _from,
-        uint256 amount,
-        uint256 blocktime
-    );
-
-    function withdraw_contract() public onlyDAOOwner {
-        uint256 left = IERC20(MSNAddr).balanceOf(address(this));
-        require(left > 0, "No Balance");
-        IERC20(MSNAddr).transfer(msg.sender, left);
-        emit withdraw_contract_EVENT(
-            msg.sender,
-            address(this),
-            left,
-            block.timestamp
-        );
-    }
-
     modifier onlyKeeper() {
         require(bytes(keepers[msg.sender]).length != 0, "No such a Keeper");
         _;
@@ -261,25 +242,6 @@ contract MSN_DAO {
         return deposit_lasttime[addr];
     }
 
-    event withdraw_token_EVENT(
-        address trigger_user_addr,
-        uint256 amount,
-        uint256 blocktime
-    );
-
-    function withdraw_token(uint256 amount) external {
-        require(
-            deposit_lasttime[msg.sender] + voter_hold_secs < block.timestamp,
-            "Not enough time"
-        );
-        uint256 d_amount = deposit[msg.sender];
-        require(d_amount >= amount, "not enough to withdraw");
-        deposit[msg.sender] = d_amount - amount;
-        bool t_result = IERC20(MSNAddr).transfer(msg.sender, amount);
-        require(t_result == true, "transfer error");
-        emit withdraw_token_EVENT(msg.sender, amount, block.timestamp);
-    }
-
     event vote_EVENT(
         address trigger_user_addr,
         uint16 _pid,
@@ -323,6 +285,25 @@ contract MSN_DAO {
         return proposal_votes[_pid][_option];
     }
 
+    event withdraw_token_EVENT(
+        address trigger_user_addr,
+        uint256 amount,
+        uint256 blocktime
+    );
+
+    function withdraw_token(uint256 amount) external {
+        require(
+            deposit_lasttime[msg.sender] + voter_hold_secs < block.timestamp,
+            "Not enough time"
+        );
+        uint256 d_amount = deposit[msg.sender];
+        require(d_amount >= amount, "not enough to withdraw");
+        deposit[msg.sender] = d_amount - amount;
+        bool t_result = IERC20(MSNAddr).transfer(msg.sender, amount);
+        require(t_result == true, "transfer error");
+        emit withdraw_token_EVENT(msg.sender, amount, block.timestamp);
+    }
+
     receive() external payable {
         payable_amount += msg.value;
     }
@@ -331,8 +312,37 @@ contract MSN_DAO {
         payable_amount += msg.value;
     }
 
+    event withdraw_eth_EVENT(
+        address trigger_user_addr,
+        uint256 _amount,
+        uint256 blocktime
+    );
+
+
     function withdraw_eth() external onlyDAOOwner {
-        payable(msg.sender).transfer(address(this).balance);
+        uint256 amout_to_t = address(this).balance;
+        payable(msg.sender).transfer(amout_to_t);
         payable_amount = 0;
+        emit withdraw_eth_EVENT(msg.sender, amout_to_t, block.timestamp);
+    }
+
+
+    event withdraw_contract_EVENT(
+        address trigger_user_addr,
+        address _from,
+        uint256 amount,
+        uint256 blocktime
+    );
+
+    function withdraw_contract() public onlyDAOOwner {
+        uint256 left = IERC20(MSNAddr).balanceOf(address(this));
+        require(left > 0, "No Balance");
+        IERC20(MSNAddr).transfer(msg.sender, left);
+        emit withdraw_contract_EVENT(
+            msg.sender,
+            address(this),
+            left,
+            block.timestamp
+        );
     }
 }

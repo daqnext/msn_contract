@@ -64,26 +64,7 @@ contract MSN_MINING {
         return IERC20(MSNAddr).balanceOf(address(this));
     }
 
-    event withdraw_contract_EVENT(
-        address trigger_user_addr,
-        address _from,
-        address _to,
-        uint256 amount,
-        uint256 blocktime
-    );
-
-    function withdraw_contract() public onlyMiningOwner {
-        uint256 left = IERC20(MSNAddr).balanceOf(address(this));
-        require(left > 0, "No balance");
-        IERC20(MSNAddr).transfer(msg.sender, left);
-        emit withdraw_contract_EVENT(
-            msg.sender,
-            address(this),
-            msg.sender,
-            left,
-            block.timestamp
-        );
-    }
+     
 
     function get_keeper(address keeper_addr)
         public
@@ -259,8 +240,37 @@ contract MSN_MINING {
         payable_amount += msg.value;
     }
 
+
+    event withdraw_eth_EVENT(
+        address trigger_user_addr,
+        uint256 _amount,
+        uint256 blocktime
+    );
+
     function withdraw_eth() external onlyMiningOwner {
-        payable(msg.sender).transfer(address(this).balance);
+        uint256 amout_to_t = address(this).balance;
+        payable(msg.sender).transfer(amout_to_t);
         payable_amount = 0;
+        emit withdraw_eth_EVENT(msg.sender, amout_to_t, block.timestamp);
+    }
+
+
+    event withdraw_contract_EVENT(
+        address trigger_user_addr,
+        address _from,
+        uint256 amount,
+        uint256 blocktime
+    );
+
+    function withdraw_contract() public onlyMiningOwner {
+        uint256 left = IERC20(MSNAddr).balanceOf(address(this));
+        require(left > 0, "No balance");
+        IERC20(MSNAddr).transfer(msg.sender, left);
+        emit withdraw_contract_EVENT(
+            msg.sender,
+            address(this),
+            left,
+            block.timestamp
+        );
     }
 }
