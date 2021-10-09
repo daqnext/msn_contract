@@ -15,7 +15,7 @@ contract MSN_MINING {
     mapping(bytes32 => uint256) private merkleRoots; // merkleRoot=>balance
     mapping(bytes32 => mapping(uint256 => bool)) private claimed; //bytes32 merkleRoot => (index => true|false)
 
-    mapping(address => uint256) private stacking;
+    mapping(address => uint256) private acc_stacking;
 
     constructor(address _MSNcontractAddr) {
         MiningOwner = msg.sender;
@@ -208,28 +208,12 @@ contract MSN_MINING {
             amount
         );
         require(t_result == true, "transfer error");
-
-        stacking[msg.sender] += amount;
+        acc_stacking[msg.sender] += amount;
         emit stack_token_EVENT(msg.sender, amount, userid, block.timestamp);
     }
 
-    function get_stack(address addr) public view returns (uint256) {
-        return stacking[addr];
-    }
-
-    event unstack_all_token_EVENT(
-        address trigger_user_addr,
-        uint256 amount,
-        uint256 blocktime
-    );
-
-    function unstack_all_token() external {
-        uint256 s_amount = stacking[msg.sender];
-        require(s_amount > 0, "no stacking");
-        stacking[msg.sender] = 0;
-        bool t_result = IERC20(MSNAddr).transfer(msg.sender, s_amount);
-        require(t_result == true, "transfer error");
-        emit unstack_all_token_EVENT(msg.sender, s_amount, block.timestamp);
+    function get_acc_stacking(address addr) public view returns (uint256) {
+        return acc_stacking[addr];
     }
 
     receive() external payable {
@@ -253,7 +237,6 @@ contract MSN_MINING {
         payable_amount = 0;
         emit withdraw_eth_EVENT(msg.sender, amout_to_t, block.timestamp);
     }
-
 
     event withdraw_contract_EVENT(
         address trigger_user_addr,
