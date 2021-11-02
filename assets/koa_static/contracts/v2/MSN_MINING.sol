@@ -64,8 +64,6 @@ contract MSN_MINING {
         return IERC20(MSNAddr).balanceOf(address(this));
     }
 
-     
-
     function get_keeper(address keeper_addr)
         public
         view
@@ -189,6 +187,14 @@ contract MSN_MINING {
         emit claim_erc20_EVENT(msg.sender, merkleRoot, amount, block.timestamp);
     }
 
+    function erc20_claimed(bytes32 merkleRoot, uint256 index)
+        external
+        view
+        returns (bool)
+    {
+        return  claimed[merkleRoot][index];
+    }
+
     event stake_token_EVENT(
         address trigger_user_addr,
         uint256 amount,
@@ -223,7 +229,6 @@ contract MSN_MINING {
     fallback() external payable {
         payable_amount += msg.value;
     }
-
 
     event withdraw_eth_EVENT(
         address trigger_user_addr,
